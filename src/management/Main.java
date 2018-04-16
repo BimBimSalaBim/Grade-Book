@@ -39,15 +39,19 @@ import net.miginfocom.swing.MigLayout;
 import javax.swing.JList;
 import javax.swing.JTable;
 import java.awt.SystemColor;
-
+import org.apache.commons.io.FilenameUtils;
 
 	
 public class Main {
 
 	private JFrame frame;
 	 //stores names of classes used to get how many classes are and the name of the files they are stored in
-	  ArrayList list = new ArrayList();
-	  String [][][] Classes;
+	  ArrayList ClassList = new ArrayList();
+	  ArrayList StudentList = new ArrayList();
+	  String [] Classes;
+	  String [] Students;
+	  String [] Assignments;
+	  String [] Grades;
 	  JPanel ClassesPanel = 	new JPanel();
 	  JPanel Studentpanel = new JPanel();
 	/**
@@ -75,12 +79,15 @@ public class Main {
 		//used to call non-static methods
 		Main read = new Main();
 		read.numberofclasses();
-		if(read.list != null) 
+		if(read.ClassList != null) 
 			{
 				read.ReadFile();
 				System.out.println("1");
 			}
 		read.csvToArray();
+		read.ClassArray();
+		
+		
 	}
 	
 	public void createClassLable(String name) {
@@ -104,29 +111,48 @@ public class Main {
 		//adds names to list
 		try {
 			Scanner inputStream = new Scanner(file);
+			
 			while(inputStream.hasNext()) {
-				int i = 0;
 				String data = inputStream.next();
 				System.out.println("9");
-				list.add(data);
-				String[][][] Classes = new String[i][][];
+				ClassList.add(data);			
 				System.out.println(data);
-				Classes[i][][] = data;
-				i++;
+				String basename = FilenameUtils.getBaseName(data);
+				
+				
 			}
+			
 			inputStream.close();
 		} catch (FileNotFoundException e) {
 			// 
 			e.printStackTrace();
 		}
 	}
+	public void ClassArray()
+		{
+		String[] Classes = new String[ClassList.size()];
+		File file = new File("classes.csv");
+		try {
+			Scanner inputStream = new Scanner(file);
+			
+			for(int i = 0; i < ClassList.size(); i++) {
+				String data = inputStream.next();
+				String basename = FilenameUtils.getBaseName(data);
+				Classes[i] = basename;
+			}
+		} catch (FileNotFoundException e) {
+			// 
+			e.printStackTrace();
+		}
+		}
+	
 
 	public void ReadFile() {
 		System.out.println("6");
-		for (int i = 0; i < list.size(); i++) 
+		for (int i = 0; i < ClassList.size(); i++) 
 		{
 			System.out.println("7");
-			File file = new File((String) list.get(i));
+			File file = new File((String) ClassList.get(i));
 			System.out.println("2");
 			try {
 				Scanner inputStream = new Scanner(file);
@@ -145,22 +171,26 @@ public class Main {
 
 	public void csvToArray()
 	{
-		for (int i = 0; i < list.size(); i++) 
+		for (int i = 0; i < ClassList.size(); i++) 
 		{
 			try 
 			{
-				String filename = (String) list.get(i);
+				String Name;
+				String filename = (String) ClassList.get(i);
 				System.out.println(filename);
 				Reader in = new FileReader(filename);
 				try {
 					Iterable<CSVRecord> records = CSVFormat.EXCEL.parse(in);
+					int j = 0;
 					for (CSVRecord record : records) {
 					    String id = record.get(0);
-					    String Name = record.get(1);
-					    String[][][] Classes = new String[][Name][];
+					    Name = record.get(1);
+					    StudentList.add(Name);
+					    j++;
 					  //  String students[] = new students[] {record.get(0), record.get(1)};
 					    System.out.println(id+" "+ Name);
 					}
+					
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -170,7 +200,7 @@ public class Main {
 				e.printStackTrace();
 			}		
 		}			
-		System.out.println("list"+list);
+		System.out.println("ClassList"+ClassList);
 	}
 	public void NumOfColumns() 
 	{
