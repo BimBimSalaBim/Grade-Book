@@ -6,18 +6,18 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.awt.EventQueue;
 import java.sql.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import javax.swing.JFrame;
 import java.awt.CardLayout;
 import javax.swing.JPanel;
+import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import java.awt.BorderLayout;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -40,8 +40,13 @@ import javax.swing.JList;
 import javax.swing.JTable;
 import java.awt.SystemColor;
 import org.apache.commons.io.FilenameUtils;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javafx.scene.control.Label;
+import org.h2.command.dml.Select;
 
-	
+
+
 public class Main {
 
 	private JFrame frame;
@@ -50,10 +55,13 @@ public class Main {
 	  ArrayList StudentList = new ArrayList();
 	  String [] Classes;
 	  String [] Students;
-	  String [] Assignments;
-	  String [] Grades;
+	  String [] Assignments = new String[] {"test1","test2","test3","test4"};
+	  String [] Grades = new String[] {"Grade1","Grade2","Grade3","Grade4"};
 	  JPanel ClassesPanel = 	new JPanel();
 	  JPanel Studentpanel = new JPanel();
+	  private JTable table;
+	  JList list;
+	  
 	/**
 	 * Launch the application.
 	 */
@@ -78,33 +86,106 @@ public class Main {
 		);
 		//used to call non-static methods
 		Main read = new Main();
-		read.numberofclasses();
+		//read.numberofclasses();
 		if(read.ClassList != null) 
 			{
-				read.ReadFile();
+//				read.ReadFile();
 				System.out.println("1");
 			}
-		read.csvToArray();
-		read.ClassArray();
-		
+		try {
+			read.csvToArray();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			read.ClassArray();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		read.SetList();
+		//System.out.print(read.StudentList.get(1));
 		
 	}
 	
-	public void createClassLable(String name) {
-		GridBagConstraints lable = new GridBagConstraints();
-		lable.anchor = GridBagConstraints.NORTH;
-		lable.fill = GridBagConstraints.BOTH;
-		lable.gridwidth = 4;
-		lable.gridx = 3;
-		lable.gridy = 13;
-		JLabel lblNewLabe = new JLabel("Classes");
-		lblNewLabe.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		ClassesPanel.add(lblNewLabe,lable);
-		ClassesPanel.revalidate();
-	    frame.repaint();
+	////user arraylist
+
+	public void DBconn() throws Exception 
+		{
+		        Class.forName("org.h2.Driver");
+
+		        Connection conn = DriverManager.
+		            getConnection("jdbc:h2:~/Classes", "sa", "");
+		        // add application code here
+		        //SHOW TABLES
+		      
+		       // System.out.print(rs);
+
+		        
 	}
+	public void SetList() {
+		JList list = new JList();
+		DefaultListModel dlm = new DefaultListModel();
+		ClassesPanel.remove(list);
+		dlm.removeAllElements();
+		for(int i = 0; i < ClassList.size(); i++) {
+		dlm.addElement(ClassList.get(i));
+		
+		}
+		//dlm.addElement("none");
+		list.setModel(dlm);
+		list.addListSelectionListener(new ListSelectionListener() {
+			
+            @Override
+            public void valueChanged(ListSelectionEvent arg0) {
+                if (!arg0.getValueIsAdjusting()) {
+                	System.out.print(list.getSelectedValue().toString());
+                }
+                return;
+            }
+        });
+		ClassesPanel.add(list);
+		
+		ClassesPanel.revalidate();
+	    ClassesPanel.repaint();
+	    
+		
+	}
+	
+	public void SetTable() {
+		table = new JTable();
+		DefaultTableModel model = new DefaultTableModel();
+        
+        Object[] columnsName = new Object[4];
+        
+        columnsName[0] = "Id";
+        columnsName[1] = "Fname";
+        columnsName[2] = "Lname";
+        columnsName[3] = "Age";
+        Object[] rowData = new Object[StudentList.size()];
+        model.setColumnIdentifiers(columnsName);
+        
+        for(int i = 1; i < StudentList.size(); i++){
+            
+            rowData[0] = StudentList.get(i);
+            if(i>0) {
+            	if(i < 4)
+            rowData[i] = Grades[i-1];}
+              model.addRow(rowData);
+        }
+        model.addColumn(columnsName);
+        table.setModel(model);
+		Studentpanel.add(table);
+
+
+		
+	}
+	
+	
+
 	//just gets the the names of all of the classes files and puts it in the Array list
-	public void numberofclasses() {
+	/*public void numberofclasses() {
 		//gets the file that has the names of other files used for classes
 		File file = new File("classes.csv");
 		System.out.println("8");
@@ -127,27 +208,53 @@ public class Main {
 			// 
 			e.printStackTrace();
 		}
-	}
-	public void ClassArray()
-		{
-		String[] Classes = new String[ClassList.size()];
-		File file = new File("classes.csv");
-		try {
-			Scanner inputStream = new Scanner(file);
-			
-			for(int i = 0; i < ClassList.size(); i++) {
-				String data = inputStream.next();
-				String basename = FilenameUtils.getBaseName(data);
-				Classes[i] = basename;
-			}
-		} catch (FileNotFoundException e) {
-			// 
-			e.printStackTrace();
-		}
+	}*/
+	public void ClassArray() throws Exception {
+		
+        Class.forName("org.h2.Driver");
+
+        Connection conn = DriverManager.
+            getConnection("jdbc:h2:~/Classes", "sa", "");
+        // add application code here
+        String statement = "SHOW TABLES";
+        
+        Statement st = conn.createStatement();
+        ResultSet rs = st.executeQuery(statement);
+        ResultSetMetaData rsmd = rs.getMetaData();
+
+        
+        int columnsNumber = rsmd.getColumnCount();
+        
+        ResultSetMetaData rsmd1 = rs.getMetaData();
+        int columnsNumber1 = rsmd1.getColumnCount();                     
+        String[] Classes = new String[columnsNumber1];
+        // Iterate through the data in the result set and display it. 
+
+        while (rs.next()) {
+        //Print one row          
+        for(int i = 1 ; i <= columnsNumber1; i++){
+        	String regex = rs.getString(i);
+        	regex = regex.replaceAll("\\s*\\bPUBLIC\\b\\s*", "");
+        	if(regex != "") {
+              System.out.println(regex + " this class has been added to ClassList"); //Print one element of a row
+              Classes[i-1] = regex;
+              ClassList.add(regex);
+              System.out.println(ClassList.get(i) + " This has been added to the classList arraylist");
+        	}
+        }
+
+          System.out.println();//Move to the next line to print the next row.           
+
+            }
+      
+       // System.out.print(rs);
+        conn.close();
+        
+    
 		}
 	
 
-	public void ReadFile() {
+/*	public void ReadFile() {
 		System.out.println("6");
 		for (int i = 0; i < ClassList.size(); i++) 
 		{
@@ -160,6 +267,7 @@ public class Main {
 					String data = inputStream.next();
 					System.out.println("3");
 					System.out.println(data);
+					//StudentList.add(data);
 				}
 				inputStream.close();
 			} 
@@ -167,55 +275,67 @@ public class Main {
 				e.printStackTrace();
 			}
 		}	
-	}
+	}*/
 
 	public void csvToArray()
-	{
-		for (int i = 0; i < ClassList.size(); i++) 
-		{
-			try 
-			{
-				String Name;
-				String filename = (String) ClassList.get(i);
-				System.out.println(filename);
-				Reader in = new FileReader(filename);
-				try {
-					Iterable<CSVRecord> records = CSVFormat.EXCEL.parse(in);
-					int j = 0;
-					for (CSVRecord record : records) {
-					    String id = record.get(0);
-					    Name = record.get(1);
-					    StudentList.add(Name);
-					    j++;
-					  //  String students[] = new students[] {record.get(0), record.get(1)};
-					    System.out.println(id+" "+ Name);
-					}
-					
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			} 
-			catch (FileNotFoundException e) 
-			{
-				e.printStackTrace();
-			}		
-		}			
-		System.out.println("ClassList"+ClassList);
-	}
-	public void NumOfColumns() 
-	{
-		
-	}
+			  throws Exception {
+        Class.forName("org.h2.Driver");
+
+        Connection conn = DriverManager.
+            getConnection("jdbc:h2:~/Classes", "sa", "");
+        // add application code here
+        for(int i = 0; i < ClassList.size(); i++) {
+        String statement = "SELECT NAME FROM "+ClassList.get(i+1);
+        
+        Statement st = conn.createStatement();
+        ResultSet rs = st.executeQuery(statement);
+        ResultSetMetaData rsmd = rs.getMetaData();
+
+        
+        int columnsNumber = rsmd.getColumnCount();
+        
+        ResultSetMetaData rsmd1 = rs.getMetaData();
+        int columnsNumber1 = rsmd1.getColumnCount();                     
+
+        // Iterate through the data in the result set and display it. 
+
+        while (rs.next()) {
+        //Print one row          
+        for(int j = 1 ; j <= columnsNumber1; j++){
+        	String regex = rs.getString(j);
+        	StudentList.add(regex);
+              System.out.print(regex +" This name has been added to StudentList"); //Print one element of a row
+
+        }
+
+          System.out.println();//Move to the next line to print the next row.           
+
+            }
+        }
+      
+       // System.out.print(rs);
+        conn.close();
+        
+    }
+
+
 	
-	public String[][] newStudents()
+	public String[][] newStudents() throws Exception
 	{	
+        Class.forName("org.h2.Driver");
+
+        Connection conn = DriverManager.
+            getConnection("jdbc:h2:~/Classes", "sa", "");
+        
 		String className = JOptionPane.showInputDialog(frame,
 				        "[what is the name of the class?]");
+		String CreateTable = "CREATE TABLE "+className+" ( ID int, Name varchar(255));";
+		Statement st = conn.createStatement();
+        boolean rs = st.execute(CreateTable);
 		
-		createClassLable(className);
 		System.out.println("4");
 		//add to list of the number of classes and their names
-		 try{
+/*		 try{
 			    
 			 Writer out;
 			    //FileWriter fstream = new FileWriter(System.currentTimeMillis() + "out123.txt");
@@ -234,16 +354,15 @@ public class Main {
 		 try{
 			    
 			 Writer out;
-			    //FileWriter fstream = new FileWriter(System.currentTimeMillis() + "out123.txt");
-			         out = new BufferedWriter(new FileWriter(className+".csv", true));
-			         out.append("ID,Name,");
+			 out = new BufferedWriter(new FileWriter(className+".csv", true));
+			 out.append("ID,Name,");
 			         
 			    //out.write(Arrays.toString(nums));
 			    //Close the output stream
 			         out.close();
 			    }catch (Exception e){//Catch exception if any
 			      System.err.println("Error: " + e.getMessage());
-			    }
+			    }*/
 		int NumOfStudents = Integer.parseInt(JOptionPane.showInputDialog(frame,
 		        "How many students are in "+className+"?"));
 		
@@ -268,13 +387,14 @@ public class Main {
 				        "[what is the name of student "+(i + 1)+"]");
 			}
 			
-			
-			FileOut(Name[i],Id[i], className);
+			String AddStudent = "insert INTO "+className+" VALUES ("+Id[i]+", \'"+Name[i]+"\');";
+			boolean rs1 = st.execute(AddStudent);
+			//FileOut(Name[i],Id[i], className);
 			
 		}
 		JOptionPane.showInputDialog(frame,
 		        "All of the loop works");
-		
+		SetList();
 
 		return null;
 		
@@ -330,12 +450,35 @@ public class Main {
 		ClassesPanel.setBackground(Color.WHITE);
 		ClassesPanel.setBorder(new LineBorder(new Color(0, 0, 0), 2, true));
 		frame.getContentPane().add(ClassesPanel, "cell 0 1,grow");
-		GridBagLayout gbl_ClassesPanel = new GridBagLayout();
-		gbl_ClassesPanel.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 10};
-		gbl_ClassesPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5};
-		gbl_ClassesPanel.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_ClassesPanel.rowWeights = new double[]{1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		ClassesPanel.setLayout(gbl_ClassesPanel);
+		ClassesPanel.setLayout(new MigLayout("", "[196px]", "[60px][23px][][][][][][][][][][]"));
+
+
+
+		
+				try {
+			ClassArray();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+					try {
+			csvToArray();
+		} catch (Exception e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+	
+		/*numberofclasses();
+		if(ClassList != null) 
+			{
+				ReadFile();
+				System.out.println("1");
+			}
+		ReadFile();*/
+
+		SetList();
+		SetTable();
+		
 		JButton NewClassButton = new JButton("New");
 		NewClassButton.setBackground(Color.GRAY);
 		NewClassButton.setToolTipText("Click here to add a new class.");
@@ -343,21 +486,22 @@ public class Main {
 		NewClassButton.addActionListener(new ActionListener() {
 			/// what the "new" button does
 			public void actionPerformed(ActionEvent arg0) {
-				newStudents();
+				try {
+					newStudents();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				//JOptionPane.showInputDialog("Enter Employee name. Ex. \"Faizan\" ");
 			}
 		});
-		GridBagConstraints gbc_NewClassButton = new GridBagConstraints();
-		gbc_NewClassButton.anchor = GridBagConstraints.SOUTH;
-		gbc_NewClassButton.fill = GridBagConstraints.BOTH;
-		gbc_NewClassButton.gridwidth = 4;
-		gbc_NewClassButton.gridx = 3;
-		gbc_NewClassButton.gridy = 13;
-		ClassesPanel.add(NewClassButton, gbc_NewClassButton);
+		ClassesPanel.add(NewClassButton, "cell 0 11,grow");
 		
 		
 		Studentpanel.setBorder(new LineBorder(new Color(0, 0, 0), 2));
 		frame.getContentPane().add(Studentpanel, "cell 1 1,grow");
 		Studentpanel.setLayout(new GridLayout(1, 0, 0, 0));
+		
+        	
 	}
 }
