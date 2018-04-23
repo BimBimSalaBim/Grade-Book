@@ -51,8 +51,8 @@ public class Main {
 
 	private JFrame frame;
 	 //stores names of classes used to get how many classes are and the name of the files they are stored in
-	  ArrayList ClassList = new ArrayList();
-	  ArrayList StudentList = new ArrayList();
+	  ArrayList<String> ClassList = new ArrayList<String>();
+	  ArrayList<String> StudentList = new ArrayList<String>();
 	  String [] Classes;
 	  String [] Students;
 	  String [] Assignments = new String[] {"test1","test2","test3","test4"};
@@ -60,7 +60,7 @@ public class Main {
 	  JPanel ClassesPanel = 	new JPanel();
 	  JPanel Studentpanel = new JPanel();
 	  private JTable table;
-	  JList list;
+	  JList<?> list;
 	  
 	/**
 	 * Launch the application.
@@ -85,7 +85,7 @@ public class Main {
 			}
 		);
 		//used to call non-static methods
-		Main read = new Main();
+	/*	Main read = new Main();
 		//read.numberofclasses();
 		if(read.ClassList != null) 
 			{
@@ -106,7 +106,7 @@ public class Main {
 		}
 		read.SetList();
 		//System.out.print(read.StudentList.get(1));
-		
+*/		
 	}
 	
 	////user arraylist
@@ -125,14 +125,17 @@ public class Main {
 		        
 	}
 	public void SetList() {
-		JList list = new JList();
-		DefaultListModel dlm = new DefaultListModel();
+		JList<String> list = new JList<String>();
+		DefaultListModel<String> dlm = new DefaultListModel<String>();
 		ClassesPanel.remove(list);
 		dlm.removeAllElements();
-		for(int i = 0; i < ClassList.size(); i++) {
-		dlm.addElement(ClassList.get(i));
-		
+		if(Classes != null)
+		{
+		for(int i = 0; i < Classes.length; i++) {
+		dlm.addElement(Classes[i]);
 		}
+		
+		}else {System.out.print("we null"); }
 		//dlm.addElement("none");
 		list.setModel(dlm);
 		list.addListSelectionListener(new ListSelectionListener() {
@@ -163,16 +166,17 @@ public class Main {
         columnsName[1] = "Fname";
         columnsName[2] = "Lname";
         columnsName[3] = "Age";
-        Object[] rowData = new Object[StudentList.size()];
+        Object[] rowData = new Object[Students.length];
         model.setColumnIdentifiers(columnsName);
-        
-        for(int i = 1; i < StudentList.size(); i++){
+        if(Students != null) {
+        for(int i = 0; i < Students.length; i++){
             
-            rowData[0] = StudentList.get(i);
+            rowData[0] = Students[i];
             if(i>0) {
             	if(i < 4)
             rowData[i] = Grades[i-1];}
               model.addRow(rowData);
+        }
         }
         model.addColumn(columnsName);
         table.setModel(model);
@@ -217,32 +221,33 @@ public class Main {
             getConnection("jdbc:h2:~/Classes", "sa", "");
         // add application code here
         String statement = "SHOW TABLES";
-        
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery(statement);
         ResultSetMetaData rsmd = rs.getMetaData();
 
         
-        int columnsNumber = rsmd.getColumnCount();
+        
         
         ResultSetMetaData rsmd1 = rs.getMetaData();
         int columnsNumber1 = rsmd1.getColumnCount();                     
-        String[] Classes = new String[columnsNumber1];
+        Classes = new String[columnsNumber1+1];
         // Iterate through the data in the result set and display it. 
-
+        int j = 1;
         while (rs.next()) {
         //Print one row          
         for(int i = 1 ; i <= columnsNumber1; i++){
-        	String regex = rs.getString(i);
-        	regex = regex.replaceAll("\\s*\\bPUBLIC\\b\\s*", "");
-        	if(regex != "") {
-              System.out.println(regex + " this class has been added to ClassList"); //Print one element of a row
-              Classes[i-1] = regex;
-              ClassList.add(regex);
-              System.out.println(ClassList.get(i) + " This has been added to the classList arraylist");
+        	//String regex = rs.getString(i);
+        	//regex = regex.replaceAll("PUBLIC", "");
+        	if(rs.getString(i).equals("PUBLIC"))
+        	{}
+        	else {
+        	Classes[j-1] =rs.getString(i);
+        	System.out.println(Classes[j-1] + " This has been added to the classes array at "+ (j-1));
+              //System.out.println(rs.getString(i)); //Print one element of a row
+              System.out.println(j);
+              j++;
         	}
         }
-
           System.out.println();//Move to the next line to print the next row.           
 
             }
@@ -284,8 +289,10 @@ public class Main {
         Connection conn = DriverManager.
             getConnection("jdbc:h2:~/Classes", "sa", "");
         // add application code here
-        for(int i = 0; i < ClassList.size(); i++) {
-        String statement = "SELECT NAME FROM "+ClassList.get(i+1);
+        //System.out.println(Classes+" these are the classes");
+        if(Classes != null) {
+        for(int i = 0; i < Classes.length; i++) {
+        String statement = "SELECT NAME FROM "+Classes[i];
         
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery(statement);
@@ -296,23 +303,25 @@ public class Main {
         
         ResultSetMetaData rsmd1 = rs.getMetaData();
         int columnsNumber1 = rsmd1.getColumnCount();                     
-
+        Students = new String[columnsNumber1+4];
         // Iterate through the data in the result set and display it. 
-
+        int k = 0;
         while (rs.next()) {
         //Print one row          
         for(int j = 1 ; j <= columnsNumber1; j++){
         	String regex = rs.getString(j);
-        	StudentList.add(regex);
-              System.out.print(regex +" This name has been added to StudentList"); //Print one element of a row
-
+        	Students[k]= regex;
+        	//StudentList.add(regex);
+        	
+              System.out.print(Students[k] +" This name has been added to Student at "+k); //Print one element of a row
+              k++;
         }
 
           System.out.println();//Move to the next line to print the next row.           
 
             }
         }
-      
+        }
        // System.out.print(rs);
         conn.close();
         
@@ -325,10 +334,10 @@ public class Main {
         Class.forName("org.h2.Driver");
 
         Connection conn = DriverManager.
-            getConnection("jdbc:h2:~/Classes", "sa", "");
+            getConnection("jdbc:h2:~/Classes;DB_CLOSE_DELAY=-1", "sa", "");
         
 		String className = JOptionPane.showInputDialog(frame,
-				        "[what is the name of the class?]");
+				        "[what is the name of the class? (No Spaces)]");
 		String CreateTable = "CREATE TABLE "+className+" ( ID int, Name varchar(255));";
 		Statement st = conn.createStatement();
         boolean rs = st.execute(CreateTable);
