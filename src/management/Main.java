@@ -42,7 +42,7 @@ import java.awt.SystemColor;
 import org.apache.commons.io.FilenameUtils;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javafx.scene.control.Label;
+//import javafx.scene.control.Label;
 import org.h2.command.dml.Select;
 
 
@@ -115,10 +115,8 @@ public class Main {
 		{
 		        Class.forName("org.h2.Driver");
 
-		        Connection conn = DriverManager.
-		            getConnection("jdbc:h2:~/Classes", "sa", "");
-		        // add application code here
-		        //SHOW TABLES
+		        DriverManager.
+		            getConnection("jdbc:h2:C:/Management/Classes", "sa", "");
 		      
 		       // System.out.print(rs);
 
@@ -218,19 +216,19 @@ public class Main {
         Class.forName("org.h2.Driver");
 
         Connection conn = DriverManager.
-            getConnection("jdbc:h2:~/Classes", "sa", "");
+            getConnection("jdbc:h2:C:/Management/Classes", "sa", "");
         // add application code here
         String statement = "SHOW TABLES";
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery(statement);
-        ResultSetMetaData rsmd = rs.getMetaData();
+        rs.getMetaData();
 
         
         
         
         ResultSetMetaData rsmd1 = rs.getMetaData();
         int columnsNumber1 = rsmd1.getColumnCount();                     
-        Classes = new String[columnsNumber1+1];
+        Classes = new String[columnsNumber1];
         // Iterate through the data in the result set and display it. 
         int j = 1;
         while (rs.next()) {
@@ -287,7 +285,7 @@ public class Main {
         Class.forName("org.h2.Driver");
 
         Connection conn = DriverManager.
-            getConnection("jdbc:h2:~/Classes", "sa", "");
+            getConnection("jdbc:h2:C:/Management/Classes", "sa", "");
         // add application code here
         //System.out.println(Classes+" these are the classes");
         if(Classes != null) {
@@ -299,7 +297,7 @@ public class Main {
         ResultSetMetaData rsmd = rs.getMetaData();
 
         
-        int columnsNumber = rsmd.getColumnCount();
+        rsmd.getColumnCount();
         
         ResultSetMetaData rsmd1 = rs.getMetaData();
         int columnsNumber1 = rsmd1.getColumnCount();                     
@@ -334,13 +332,13 @@ public class Main {
         Class.forName("org.h2.Driver");
 
         Connection conn = DriverManager.
-            getConnection("jdbc:h2:~/Classes;DB_CLOSE_DELAY=-1", "sa", "");
+            getConnection("jdbc:h2:C:/Management/Classes;DB_CLOSE_DELAY=-1", "sa", "");
         
 		String className = JOptionPane.showInputDialog(frame,
 				        "[what is the name of the class? (No Spaces)]");
 		String CreateTable = "CREATE TABLE "+className+" ( ID int, Name varchar(255));";
 		Statement st = conn.createStatement();
-        boolean rs = st.execute(CreateTable);
+        st.execute(CreateTable);
 		
 		System.out.println("4");
 		//add to list of the number of classes and their names
@@ -397,8 +395,7 @@ public class Main {
 			}
 			
 			String AddStudent = "insert INTO "+className+" VALUES ("+Id[i]+", \'"+Name[i]+"\');";
-			boolean rs1 = st.execute(AddStudent);
-			//FileOut(Name[i],Id[i], className);
+			st.execute(AddStudent);
 			
 		}
 		JOptionPane.showInputDialog(frame,
@@ -463,6 +460,9 @@ public class Main {
 
 
 
+		File f = new File("C:\\Management\\Classes.mv.db");
+		if(f.exists() && !f.isDirectory()) { 
+		    // do something
 		
 				try {
 			ClassArray();
@@ -484,10 +484,16 @@ public class Main {
 				System.out.println("1");
 			}
 		ReadFile();*/
-
+					for (int i = 0; i < Classes.length; i++)
+					{
+						System.out.println(Classes[i] + " Name of class "+ i);
+					}
 		SetList();
 		SetTable();
-		
+		}
+		else{
+			JOptionPane.showMessageDialog(frame, "Please Create a new class to start");
+		}
 		JButton NewClassButton = new JButton("New");
 		NewClassButton.setBackground(Color.GRAY);
 		NewClassButton.setToolTipText("Click here to add a new class.");
