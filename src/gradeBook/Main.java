@@ -320,7 +320,7 @@ public class Main {
         	}
         	else {
         		
-        String statement = "SELECT * FROM "+name+" WHERE NAME = \'"+firstName+"\';";
+        String statement = "SELECT * FROM \""+name+"\" WHERE NAME = \'"+firstName+"\';";
         
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery(statement);
@@ -439,7 +439,7 @@ public class Main {
         	}
         	else {
         		
-        String statement = "SELECT * FROM "+name/*+" WHERE ID NOT = \'999\'"*/;
+        String statement = "SELECT * FROM \""+name+"\""/*+" WHERE ID NOT = \'999\'"*/;
         
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery(statement);
@@ -450,7 +450,7 @@ public class Main {
         Connection conn1 = DriverManager.
                 getConnection("jdbc:h2:C:/Management/Classes", "sa", "");
         Statement st1 = conn1.createStatement();
-        ResultSet rs1 = st1.executeQuery("SELECT COUNT (*) FROM "+name/*+" WHERE ID NOT = \'999\'"*/);
+        ResultSet rs1 = st1.executeQuery("SELECT COUNT (*) FROM \""+name+"\""/*+" WHERE ID NOT = \'999\'"*/);
         int count = -1;
         while (rs1.next())
         {
@@ -508,7 +508,7 @@ Class.forName("org.h2.Driver");
         	}
         	else {
         		
-        String statement = "SELECT * FROM "+name+" WHERE ID = \'999\';";
+        String statement = "SELECT * FROM \""+name+"\" WHERE ID = \'999\';";
         
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery(statement);
@@ -618,7 +618,7 @@ Class.forName("org.h2.Driver");
 					/// what the "new" button does
 					public void actionPerformed(ActionEvent arg0) {
 						try {
-							EditAddClasses.setVisible(true);
+							AddClass.frame.setVisible(true);
 
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -643,7 +643,7 @@ Class.forName("org.h2.Driver");
 						        Connection conn = DriverManager.
 						            getConnection("jdbc:h2:C:/Management/Classes", "sa", "");
 						        // add application code here
-						        String statement = "DROP TABLE "+SelectedTab;
+						        String statement = "DROP TABLE \""+SelectedTab+"\"";
 						        Statement st = conn.createStatement();
 						        boolean rs = st.execute(statement);
 						        dlm.removeElement(SelectedTab);
