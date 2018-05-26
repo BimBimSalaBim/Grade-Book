@@ -61,7 +61,7 @@ public class AddAssignment extends JFrame {
 	        Statement st1 = conn.createStatement();
 	        int rs1 = st1.executeUpdate(AddNewCol);
 	        for(int i = 0; i < Main.Students.length; i++) {
-	        	if(Main.Students[i] == "Total Posible" || Main.Students[i] == "Total Posible" ) {
+	        	if(Main.Students[i].equals("Total Posible") || Main.Students[i] == "Total Posible" ) {
 	        		new print("name is total posiable");
 	        	}
 	        	else {
@@ -81,6 +81,7 @@ public class AddAssignment extends JFrame {
 	        Statement st = conn.createStatement();
 	        int rs = st.executeUpdate(InsertIntoCol);
 	       Main.UpdateTable();
+	       frame.dispose();
 	}
 	public AddAssignment() {
 		setAlwaysOnTop(true);
