@@ -1,5 +1,5 @@
 package management;
-
+//
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
@@ -21,6 +21,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 
 @SuppressWarnings("unused")
@@ -29,7 +30,7 @@ public class AddClass extends JFrame {
 	private JPanel contentPane;
 	private JTextField txtClassName = new JTextField();
 	private JTextField txtNumberOfStudents = new JTextField();
-	Main mainfile = new Main();
+	
 	static AddClass frame = new AddClass();
 	/**
 	 * Launch the application.
@@ -56,7 +57,7 @@ public class AddClass extends JFrame {
             getConnection("jdbc:h2:C:/Management/Classes;DB_CLOSE_DELAY=-1", "sa", "");
         
 		String className = txtClassName.getText();
-		mainfile.NewClassName = className;
+		
 		String CreateTable = "CREATE TABLE "+className+" ( ID int, Name varchar(255));";
 		Statement st = conn.createStatement();
         st.execute(CreateTable);
@@ -90,14 +91,17 @@ public class AddClass extends JFrame {
 			st.execute(AddStudent);
 			
 		}
+		String AddTotal = "insert INTO "+className+" VALUES ("+999+", \'Total Posible\');";
+		st.execute(AddTotal);
+		Main.dlm.addElement(className);
 		JOptionPane.showMessageDialog(contentPane,
-		        "All of the loop works");
-		mainfile.AddToList(className);
+		        "All of the loop works"+ className);
 		
 
 		return null;
 		
 	}
+
 	/**
 	 * Create the frame.
 	 */
@@ -139,6 +143,7 @@ public class AddClass extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					newStudents();
+					dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
