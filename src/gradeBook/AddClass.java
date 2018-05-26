@@ -58,7 +58,7 @@ public class AddClass extends JFrame {
         
 		String className = txtClassName.getText();
 		
-		String CreateTable = "CREATE TABLE "+className+" ( ID int, Name varchar(255));";
+		String CreateTable = "CREATE TABLE \""+className+"\" ( ID int, Name varchar(255));";
 		Statement st = conn.createStatement();
         st.execute(CreateTable);
 		
@@ -87,15 +87,14 @@ public class AddClass extends JFrame {
 				        "[what is the name of student "+(i + 1)+"]");
 			}
 			
-			String AddStudent = "insert INTO "+className+" VALUES ("+Id[i]+", \'"+Name[i]+"\');";
+			String AddStudent = "insert INTO \""+className+"\" VALUES ("+Id[i]+", \'"+Name[i]+"\');";
 			st.execute(AddStudent);
 			
 		}
-		String AddTotal = "insert INTO "+className+" VALUES ("+999+", \'Total Posible\');";
+		String AddTotal = "insert INTO \""+className+"\" VALUES ("+999+", \'Total Posible\');";
 		st.execute(AddTotal);
 		Main.dlm.addElement(className);
-		JOptionPane.showMessageDialog(contentPane,
-		        "All of the loop works"+ className);
+		Main.UpdateTable();
 		
 
 		return null;
